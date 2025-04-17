@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: pd-app
+spec:
+  selector:
+    app: pd-app
+  ports:
+  - port: 80
+    targetPort: 3000
+    protocol: TCP

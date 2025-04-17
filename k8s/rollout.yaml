@@ -1,0 +1,35 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: pd-app
+  annotations:
+    # Argo Notifications will read these; leave blank for now
+spec:
+  replicas: 2
+  strategy:
+    canary:
+      steps:
+      - setWeight: 25
+      - pause: { duration: 60 }    # 1 min
+      - setWeight: 75
+      - pause: { duration: 60 }
+      - setWeight: 100
+  selector:
+    matchLabels:
+      app: pd-app
+  template:
+    metadata:
+      labels:
+        app: pd-app
+    spec:
+      containers:
+      - name: pd-app
+        image: YOUR_DOCKER_USER/pd-app:latest
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 3000
+          initialDelaySeconds: 3
+          periodSeconds: 5
+        ports:
+        - containerPort: 3000
